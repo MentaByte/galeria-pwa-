@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <base href="./">
+  <base href="/galeria-pwa-/"> <!-- ¡CAMBIAR POR TU NOMBRE DE REPOSITORIO REAL! -->
   <title>Galería de Bebidas</title>
   <link rel="manifest" href="manifest.json">
   <style>
@@ -15,7 +15,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #ffffff; /* Fondo blanco */
+      background-color: #ffffff;
       height: 100vh;
       width: 100vw;
       touch-action: pan-x;
@@ -45,15 +45,15 @@
 
     #touchCounter {
       position: fixed;
-      bottom: 10px; /* Posición más discreta */
+      bottom: 10px;
       left: 10px;
-      background-color: rgba(0, 0, 0, 0.2); /* Más transparente */
-      color: #000000; /* Texto negro */
-      padding: 2px 8px; /* Más pequeño */
+      background-color: rgba(0, 0, 0, 0.2);
+      color: #000000;
+      padding: 2px 8px;
       border-radius: 10px;
       z-index: 1000;
       font-family: Arial, sans-serif;
-      font-size: 12px; /* Mitad del tamaño original */
+      font-size: 12px;
     }
 
     #fullScreenImage {
@@ -64,7 +64,7 @@
       width: 100vw;
       height: 100vh;
       object-fit: contain;
-      background-color: white; /* Fondo blanco */
+      background-color: white;
       z-index: 9999;
     }
 
@@ -99,12 +99,21 @@
     </div>
   </div>
 
-  <div id="touchCounter">0</div> <!-- Solo muestra el número -->
+  <div id="touchCounter">0</div>
   <button id="installButton">Instalar App</button>
 
   <img id="fullScreenImage" src="https://i.imgur.com/CDkvzSZ.jpg" alt="Imagen especial">
 
   <script>
+    // Detectar si estamos en GitHub Pages
+    const isGitHubPages = window.location.host.includes('github.io');
+    const repoName = '/galeria-pwa-/'; // ¡CAMBIAR POR TU NOMBRE DE REPOSITORIO REAL!
+
+    // Redirección para evitar 404
+    if (isGitHubPages && window.location.pathname === '/') {
+      window.location.href = repoName;
+    }
+
     // Contador de toques
     let touchCount = 0;
     const touchCounterElement = document.getElementById("touchCounter");
@@ -114,7 +123,7 @@
       if (!isCounting) return;
       
       touchCount++;
-      touchCounterElement.textContent = touchCount; // Solo el número
+      touchCounterElement.textContent = touchCount;
       
       if (touchCount >= 10) {
         const fullScreenImage = document.getElementById("fullScreenImage");
@@ -133,9 +142,20 @@
     function enterFullscreen() {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
+        elem.requestFullscreen().catch(err => {
+          console.log("Error al solicitar pantalla completa:", err);
+        });
+      }
+    }
+
+    // Forzar orientación vertical
+    function lockOrientation() {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('portrait').catch(e => {
+          console.log("No se pudo bloquear orientación:", e);
+        });
+      } else if (screen.lockOrientation) {
+        screen.lockOrientation('portrait');
       }
     }
 
@@ -162,24 +182,27 @@
     // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(registration => console.log('SW registrado en:', registration.scope))
-          .catch(err => console.log('Error SW:', err));
+        const swUrl = isGitHubPages ? repoName + 'sw.js' : './sw.js';
+        navigator.serviceWorker.register(swUrl)
+          .then(registration => {
+            console.log('SW registrado en:', registration.scope);
+          })
+          .catch(err => {
+            console.log('Error al registrar SW:', err);
+          });
       });
-    }
-
-    // Redirección para evitar 404
-    if (window.location.pathname === '/' && !window.location.href.includes('github.io')) {
-      window.location.href = './index.html';
     }
 
     // Eventos iniciales
     document.addEventListener("DOMContentLoaded", () => {
       document.body.addEventListener("touchstart", incrementTouchCount);
       
-      // Forzar pantalla completa en PWA
+      // Forzar orientación y pantalla completa en PWA
       if (window.matchMedia('(display-mode: standalone)').matches) {
-        setTimeout(enterFullscreen, 500);
+        setTimeout(() => {
+          lockOrientation();
+          enterFullscreen();
+        }, 500);
       }
     });
   </script>
