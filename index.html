@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <title>Image Gallery</title>
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Evita el desplazamiento vertical */
+      background-color: #ffffff;
+    }
+
+    .gallery-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .gallery {
+      display: flex;
+      justify-content: flex-start; /* Alinea las imágenes al inicio */
+      align-items: center; /* Centra las imágenes verticalmente */
+      width: 900vw; /* Ancho suficiente para todas las imágenes */
+    }
+
+    .gallery img {
+      width: 900px; /* Ancho fijo de cada imagen */
+      height: auto; /* Altura ajustada automáticamente */
+      object-fit: cover;
+      margin-right: 10px; /* Margen entre las imágenes */
+    }
+
+    .gallery img:last-child {
+      margin-right: 0; /* Elimina el margen derecho de la última imagen */
+    }
+
+    #touchCounter {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background-color: rgba(255, 255, 255, 0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    #fullScreenImage {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      z-index: 9999;
+      background-color: white;
+    }
+
+    #installButton {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery-container">
+    <div class="gallery">
+      <img src="https://i.imgur.com/NTpM7zB.jpg" alt="AguaMineral">
+      <img src="https://i.imgur.com/8NB2kyD.jpg" alt="AguaCoco">
+      <img src="https://i.imgur.com/cLVENtZ.jpg" alt="cocacola">
+      <img src="https://i.imgur.com/N5Dw0uI.jpg" alt="gatorade">
+      <img src="https://i.imgur.com/jibpP7q.jpg" alt="mango">
+      <img src="https://i.imgur.com/ZS1JtFE.jpg" alt="mora">
+      <img src="https://i.imgur.com/bDjSxj7.jpg" alt="Pony">
+      <img src="https://i.imgur.com/xbHO4ET.jpg" alt="sprite">
+      <img src="https://i.imgur.com/752qncM.jpg" alt="zero">
+      <img src="https://i.imgur.com/NTpM7zB.jpg" alt="AguaMineral">
+      <img src="https://i.imgur.com/8NB2kyD.jpg" alt="AguaCoco">
+      <img src="https://i.imgur.com/cLVENtZ.jpg" alt="cocacola">
+      <img src="https://i.imgur.com/N5Dw0uI.jpg" alt="gatorade">
+      <img src="https://i.imgur.com/jibpP7q.jpg" alt="mango">
+      <img src="https://i.imgur.com/ZS1JtFE.jpg" alt="mora">
+      <img src="https://i.imgur.com/bDjSxj7.jpg" alt="Pony">
+      <img src="https://i.imgur.com/xbHO4ET.jpg" alt="sprite">
+      <img src="https://i.imgur.com/752qncM.jpg" alt="zero">
+    </div>
+  </div>
+  <div id="touchCounter">Tocadas: 0</div>
+  <button id="installButton" aria-label="Instalar aplicación">Instalar App</button>
+
+  <img id="fullScreenImage" src="https://i.imgur.com/CDkvzSZ.jpg" alt="AguaCocoForzaje">
+
+  <script>
+    var touchCount = 0;
+    var touchCounterElement = document.getElementById("touchCounter");
+    var isCounting = true;
+
+    function incrementTouchCount() {
+      if (!isCounting) return;
+      
+      touchCount++;
+      touchCounterElement.innerText = "Tocadas: " + touchCount;
+      
+      if (touchCount >= 10) {
+        var fullScreenImage = document.getElementById("fullScreenImage");
+        fullScreenImage.style.display = "block";
+        isCounting = false; // Detiene el contador
+        // Vibra el teléfono por 200 milisegundos
+        if (navigator.vibrate) {
+          navigator.vibrate(200);
+        }
+        // Solicitar el modo de pantalla completa
+        var docElm = document.documentElement;
+        if (docElm.requestFullscreen) {
+          docElm.requestFullscreen();
+        } else if (docElm.mozRequestFullScreen) { /* Firefox */
+          docElm.mozRequestFullScreen();
+        } else if (docElm.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+          docElm.webkitRequestFullscreen();
+        } else if (docElm.msRequestFullscreen) { /* IE/Edge */
+          docElm.msRequestFullscreen();
+        }
+      }
+    }
+
+    // Registra el Service Worker para la PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+
+    // Maneja el botón de instalación
+    let deferredPrompt;
+    const installButton = document.getElementById('installButton');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Previene que el mini-infobar aparezca en mobile
+      e.preventDefault();
+      // Guarda el evento para que pueda ser activado más tarde
+      deferredPrompt = e;
+      // Muestra el botón de instalación
+      installButton.style.display = 'block';
+    });
+
+    installButton.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      
+      // Muestra el prompt de instalación
+      deferredPrompt.prompt();
+      // Espera a que el usuario responda al prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      // Opcionalmente, envía analytics del resultado
+      console.log(`User response to the install prompt: ${outcome}`);
+      // Ya no necesitamos el prompt, lo limpiamos
+      deferredPrompt = null;
+      // Esconde el botón de instalación
+      installButton.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      // Oculta el botón de instalación
+      installButton.style.display = 'none';
+      // Limpia el deferredPrompt
+      deferredPrompt = null;
+      // Opcionalmente, envía analytics que la PWA fue instalada
+      console.log('PWA was installed');
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      document.body.addEventListener("touchstart", incrementTouchCount);
+    });
+  </script>
+</body>
+</html>
