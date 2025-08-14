@@ -1,10 +1,10 @@
 const CACHE_NAME = 'galeria-v5';
 const ASSETS = [
-  '/galeria-pwa-/', // ¡CAMBIAR POR TU NOMBRE DE REPOSITORIO REAL!
-  '/galeria-pwa-/index.html',
-  '/galeria-pwa-/manifest.json',
-  '/galeria-pwa-/icon-192x192.png',
-  '/galeria-pwa-/icon-512x512.png',
+  '/MentaByte/galeria-pwa-/', // ¡CAMBIAR POR TU NOMBRE DE REPOSITORIO REAL!
+  '/MentaByte/galeria-pwa-/index.html',
+  '/MentaByte/galeria-pwa-/manifest.json',
+  '/MentaByte/galeria-pwa-/icon-192x192.png',
+  '/MentaByte/galeria-pwa-/icon-512x512.png',
   'https://i.imgur.com/NTpM7zB.jpg',
   'https://i.imgur.com/8NB2kyD.jpg',
   'https://i.imgur.com/cLVENtZ.jpg',
@@ -44,3 +44,4 @@ self.addEventListener('fetch', (event) => {
       .then(response => response || fetch(event.request))
   );
 });
+
