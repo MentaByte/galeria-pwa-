@@ -1,12 +1,10 @@
-
-const CACHE_NAME = 'galeria-v6';
+const CACHE_NAME = 'galeria-v7';
 const ASSETS = [
-  'https://mentabyte.github.io/galeria-pwa-/',
-  'https://mentabyte.github.io/galeria-pwa-/index.html',
-  'https://mentabyte.github.io/galeria-pwa-/manifest.json',
-  'https://mentabyte.github.io/galeria-pwa-/icon-192x192.png',
-  'https://mentabyte.github.io/galeria-pwa-/icon-512x512.png',
-  'https://i.imgur.com/NTpM7zB.jpg',
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192x192.png',
+  './icon-512x512.png',
   'https://i.imgur.com/NTpM7zB.jpg',
   'https://i.imgur.com/8NB2kyD.jpg',
   'https://i.imgur.com/cLVENtZ.jpg',
@@ -26,13 +24,17 @@ self.addEventListener('install', (event) => {
   );
 });
 
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    )
+  );
+});
+
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then(response => response || fetch(event.request))
   );
 });
-
-
-
-
