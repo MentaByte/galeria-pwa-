@@ -7,9 +7,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <base href="https://mentabyte.github.io/galeria-pwa-/">
   <title>Galería de Bebidas</title>
-  <link rel="manifest" href="https://mentabyte.github.io/galeria-pwa-/manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <style>
     body {
       margin: 0;
@@ -20,7 +19,6 @@
       width: 100vw;
       touch-action: pan-x;
     }
-
     .gallery-container {
       width: 100vw;
       height: 100vh;
@@ -29,12 +27,10 @@
       display: flex;
       -webkit-overflow-scrolling: touch;
     }
-
     .gallery {
       display: flex;
       height: 100vh;
     }
-
     .gallery img {
       width: 100vw;
       height: 100vh;
@@ -42,7 +38,6 @@
       scroll-snap-align: start;
       flex: 0 0 auto;
     }
-
     #touchCounter {
       position: fixed;
       bottom: 10px;
@@ -55,7 +50,6 @@
       font-family: Arial, sans-serif;
       font-size: 12px;
     }
-
     #fullScreenImage {
       display: none;
       position: fixed;
@@ -67,7 +61,6 @@
       background-color: white;
       z-index: 9999;
     }
-
     #installButton {
       position: fixed;
       bottom: 20px;
@@ -105,15 +98,6 @@
   <img id="fullScreenImage" src="https://i.imgur.com/CDkvzSZ.jpg" alt="Imagen especial">
 
   <script>
-    // Detectar si estamos en GitHub Pages
-    const isGitHubPages = window.location.host.includes('github.io');
-    const repoUrl = 'https://mentabyte.github.io/galeria-pwa-/';
-
-    // Redirección para evitar 404
-    if (window.location.href === 'https://mentabyte.github.io/galeria-pwa-' || 
-    window.location.href === 'https://mentabyte.github.io/galeria-pwa-/') {
-    window.location.href = repoUrl + 'index.html';
-
     // Contador de toques
     let touchCount = 0;
     const touchCounterElement = document.getElementById("touchCounter");
@@ -121,76 +105,54 @@
 
     function incrementTouchCount() {
       if (!isCounting) return;
-      
       touchCount++;
       touchCounterElement.textContent = touchCount;
-      
       if (touchCount >= 10) {
         const fullScreenImage = document.getElementById("fullScreenImage");
         fullScreenImage.style.display = "block";
         isCounting = false;
-        
-        if (navigator.vibrate) {
-          navigator.vibrate(200);
-        }
-        
+        if (navigator.vibrate) navigator.vibrate(200);
         enterFullscreen();
       }
     }
 
-    // Pantalla completa
     function enterFullscreen() {
       const elem = document.documentElement;
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen().catch(err => {
-          console.log("Error al solicitar pantalla completa:", err);
-        });
-      }
+      if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
     }
 
-    // Forzar orientación vertical
     function lockOrientation() {
-      if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('portrait').catch(e => {
-          console.log("No se pudo bloquear orientación:", e);
-        });
-      } else if (screen.lockOrientation) {
-        screen.lockOrientation('portrait');
+      if (screen.orientation?.lock) {
+        screen.orientation.lock('portrait').catch(() => {});
       }
     }
 
     // Instalación PWA
     let deferredPrompt;
     const installButton = document.getElementById('installButton');
-    
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       installButton.style.display = 'block';
     });
-
     installButton.addEventListener('click', async () => {
       if (!deferredPrompt) return;
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        installButton.style.display = 'none';
-      }
+      if (outcome === 'accepted') installButton.style.display = 'none';
       deferredPrompt = null;
     });
 
-     // Service Worker
+    // Service Worker
     if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register(repoUrl + 'sw.js')
-    .then(registration => console.log('SW registrado'))
-    .catch(err => console.log('Error SW:', err));
+      navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW registrado'))
+      .catch(err => console.log('Error SW:', err));
     }
 
     // Eventos iniciales
     document.addEventListener("DOMContentLoaded", () => {
       document.body.addEventListener("touchstart", incrementTouchCount);
-      
-      // Forzar orientación y pantalla completa en PWA
       if (window.matchMedia('(display-mode: standalone)').matches) {
         setTimeout(() => {
           lockOrientation();
