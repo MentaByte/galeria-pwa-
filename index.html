@@ -7,9 +7,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <base href="/MentaByte/galeria-pwa-/">
+  <base href="https://mentabyte.github.io/galeria-pwa-/">
   <title>Galería de Bebidas</title>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="https://mentabyte.github.io/galeria-pwa-/manifest.json">
   <style>
     body {
       margin: 0;
@@ -107,11 +107,12 @@
   <script>
     // Detectar si estamos en GitHub Pages
     const isGitHubPages = window.location.host.includes('github.io');
-    const repoName = '/MentaByte/galeria-pwa-/';
+    const repoUrl = 'https://mentabyte.github.io/galeria-pwa-/';
+
     // Redirección para evitar 404
-    if (isGitHubPages && window.location.pathname === '/') {
-      window.location.href = repoName;
-    }
+    if (window.location.href === 'https://mentabyte.github.io/galeria-pwa-' || 
+    window.location.href === 'https://mentabyte.github.io/galeria-pwa-/') {
+    window.location.href = repoUrl + 'index.html';
 
     // Contador de toques
     let touchCount = 0;
@@ -178,18 +179,11 @@
       deferredPrompt = null;
     });
 
-    // Service Worker
+     // Service Worker
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        const swUrl = isGitHubPages ? repoName + 'sw.js' : './sw.js';
-        navigator.serviceWorker.register(swUrl)
-          .then(registration => {
-            console.log('SW registrado en:', registration.scope);
-          })
-          .catch(err => {
-            console.log('Error al registrar SW:', err);
-          });
-      });
+    navigator.serviceWorker.register(repoUrl + 'sw.js')
+    .then(registration => console.log('SW registrado'))
+    .catch(err => console.log('Error SW:', err));
     }
 
     // Eventos iniciales
