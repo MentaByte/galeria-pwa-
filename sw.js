@@ -1,7 +1,10 @@
-const CACHE_NAME = 'galeria-v2';
+const CACHE_NAME = 'galeria-v4';
 const ASSETS = [
-  '/',
-  '/index.html',
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192x192.png',
+  './icon-512x512.png',
   'https://i.imgur.com/NTpM7zB.jpg',
   'https://i.imgur.com/8NB2kyD.jpg',
   'https://i.imgur.com/cLVENtZ.jpg',
