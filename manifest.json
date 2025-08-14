@@ -1,11 +1,13 @@
 {
-  "name": "Galería de Imágenes",
-  "short_name": "Galería",
-  "description": "Una galería de imágenes interactiva",
+  "name": "Galería de Bebidas",
+  "short_name": "Bebidas",
+  "description": "Galería interactiva de imágenes de bebidas",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "icon-192x192.png",
